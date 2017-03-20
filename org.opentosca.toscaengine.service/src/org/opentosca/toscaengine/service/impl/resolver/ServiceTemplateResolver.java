@@ -264,6 +264,9 @@ public class ServiceTemplateResolver extends GenericResolver {
 					if (template instanceof TRelationshipTemplate) {
 						
 						TRelationshipTemplate relationshipTemplate = (TRelationshipTemplate) template;
+						
+						referenceMapper.storeRelationshipTemplateIDForServiceTemplateAndCSAR(csarID, serviceTemplateID, relationshipTemplate.getId());
+						
 						referenceMapper.storeJAXBObjectIntoToscaReferenceMapper(new QName(targetNamespace, relationshipTemplate.getId()), relationshipTemplate);
 						
 						// resolve the RelationshipType
