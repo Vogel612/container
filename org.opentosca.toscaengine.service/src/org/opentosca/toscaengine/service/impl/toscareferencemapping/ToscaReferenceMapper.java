@@ -84,6 +84,7 @@ public class ToscaReferenceMapper implements IToscaReferenceMapper {
 	private Map<CSARID, Map<String, String>> mapCSARIDToPlanNameToNamespace = new HashMap<CSARID, Map<String, String>>();
 	
 	private Map<CSARID, Map<QName, List<String>>> mapCSARIDToServiceTemplateQNameToNodeTemplateID = new HashMap<>();
+	private Map<CSARID, Map<QName, List<String>>> mapCSARIDToServiceTemplateQNameToRelationshipTemplateID = new HashMap<>();
 	
 	private Map<CSARID, Map<QName, String>> serviceTemplatePropertiesContent = new HashMap<CSARID, Map<QName, String>>();
 	private Map<CSARID, Map<QName, PropertyMappings>> serviceTemplatePropertyMappings = new HashMap<CSARID, Map<QName, PropertyMappings>>();
@@ -1123,6 +1124,21 @@ public class ToscaReferenceMapper implements IToscaReferenceMapper {
 	}
 	
 	@Override
+	public void storeRelationshipTemplateIDForServiceTemplateAndCSAR(CSARID csarID, QName serviceTemplateID, String id) {
+		if (!mapCSARIDToServiceTemplateQNameToRelationshipTemplateID.containsKey(csarID)) {
+			mapCSARIDToServiceTemplateQNameToRelationshipTemplateID.put(csarID, new HashMap<QName, List<String>>());
+		}
+		Map<QName, List<String>> map = mapCSARIDToServiceTemplateQNameToRelationshipTemplateID.get(csarID);
+		if (!map.containsKey(serviceTemplateID)) {
+			map.put(serviceTemplateID, new ArrayList<String>());
+		}
+		List<String> list = map.get(serviceTemplateID);
+		if (!list.contains(id)) {
+			list.add(id);
+		}
+	}
+	
+	@Override
 	public void storeNodeTemplateIDForServiceTemplateAndCSAR(CSARID csarID, QName serviceTemplateID, String id) {
 		if (!mapCSARIDToServiceTemplateQNameToNodeTemplateID.containsKey(csarID)) {
 			mapCSARIDToServiceTemplateQNameToNodeTemplateID.put(csarID, new HashMap<QName, List<String>>());
@@ -1141,6 +1157,12 @@ public class ToscaReferenceMapper implements IToscaReferenceMapper {
 	public Map<QName, List<String>> getServiceTemplatesAndNodeTemplatesInCSAR(CSARID csarID) {
 		return mapCSARIDToServiceTemplateQNameToNodeTemplateID.get(csarID);
 	}
+	
+	@Override
+	public Map<QName, List<String>> getServiceTemplatesAndRelationshipTemplatesInCSAR(CSARID csarID) {
+		return mapCSARIDToServiceTemplateQNameToRelationshipTemplateID.get(csarID);
+	}
+	
 	
 	@Override
 	public void storeServiceTemplateBoundsPropertiesInformation(CSARID csarID, QName serviceTemplateID, String propertiesContent, PropertyMappings propertyMappings) {
@@ -1181,4 +1203,6 @@ public class ToscaReferenceMapper implements IToscaReferenceMapper {
 		}
 		return ret;
 	}
+
+	
 }

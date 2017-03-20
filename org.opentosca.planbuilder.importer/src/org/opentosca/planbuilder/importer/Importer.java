@@ -30,11 +30,11 @@ import org.slf4j.LoggerFactory;
  *
  */
 public class Importer extends AbstractImporter {
-
+	
 	final private static Logger LOG = LoggerFactory.getLogger(Importer.class);
 	private CSARHandler handler = new CSARHandler();
-
-
+	
+	
 	/**
 	 * Generates a List of BuildPlans for the given CSARID. The BuildPlans are
 	 * generated for the ServiceTemplates inside the Entry-Definitions Document,
@@ -56,7 +56,25 @@ public class Importer extends AbstractImporter {
 		}
 		return new ArrayList<BuildPlan>();
 	}
-
+	
+	/**
+	 * Returns a TOSCA Definitions object which contains the
+	 * Entry-ServiceTemplate
+	 * 
+	 * @param csarId an ID of a CSAR
+	 * @return an AbstractDefinitions object
+	 */
+	public AbstractDefinitions getMainDefinitions(CSARID csarId) {
+		try {
+			return this.createContext(this.handler.getCSARContentForID(csarId));
+		} catch (UserException e) {
+			Importer.LOG.error("Some error within input", e);
+		} catch (SystemException e) {
+			Importer.LOG.error("Some internal error", e);
+		}
+		return null;
+	}
+	
 	/**
 	 * Creates an AbstractDefinitions Object of the given CSARContent
 	 *
@@ -71,5 +89,5 @@ public class Importer extends AbstractImporter {
 		Set<AbstractFile> referencedFilesInCsar = csarContent.getFilesRecursively();
 		return new DefinitionsImpl(rootTosca, referencedFilesInCsar, true);
 	}
-
+	
 }

@@ -23,6 +23,7 @@ import org.opentosca.model.tosca.TArtifactReference.Include;
 import org.opentosca.model.tosca.TArtifactTemplate;
 import org.opentosca.model.tosca.TArtifactTemplate.ArtifactReferences;
 import org.opentosca.model.tosca.TBoundaryDefinitions;
+import org.opentosca.model.tosca.TCapability;
 import org.opentosca.model.tosca.TDefinitions;
 import org.opentosca.model.tosca.TDeploymentArtifact;
 import org.opentosca.model.tosca.TDeploymentArtifacts;
@@ -41,6 +42,7 @@ import org.opentosca.model.tosca.TRelationshipTemplate;
 import org.opentosca.model.tosca.TRelationshipType;
 import org.opentosca.model.tosca.TRelationshipTypeImplementation;
 import org.opentosca.model.tosca.TRequiredContainerFeature;
+import org.opentosca.model.tosca.TRequirement;
 import org.opentosca.model.tosca.TServiceTemplate;
 import org.opentosca.toscaengine.service.IToscaEngineService;
 import org.opentosca.toscaengine.service.IToscaReferenceMapper;
@@ -2202,6 +2204,15 @@ public class ToscaEngineServiceImpl implements IToscaEngineService {
 	}
 	
 	@Override
+	public List<String> getRelationshipTemplatesOfServiceTemplate(CSARID csarId, QName serviceTemplate) {
+		Map<QName, List<String>> map = toscaReferenceMapper.getServiceTemplatesAndRelationshipTemplatesInCSAR(csarId);
+		if (null != map) {
+			return map.get(serviceTemplate);
+		}
+		return new ArrayList<String>();
+	}
+	
+	@Override
 	public TBoundaryDefinitions getBoundaryDefinitionsOfServiceTemplate(CSARID csarId, QName serviceTemplateId) {
 		// get the referenced ServiceTemplate
 		TServiceTemplate serviceTemplate = (TServiceTemplate) ToscaEngineServiceImpl.toscaReferenceMapper.getJAXBReference(csarId, serviceTemplateId);
@@ -2235,6 +2246,66 @@ public class ToscaEngineServiceImpl implements IToscaEngineService {
 		}
 		
 		return qnames;
+	}
+	
+	@Override
+	public List<QName> getNodeTemplateCapabilities(CSARID csarId, QName serviceTemplateId, String nodeTemplateId) {
+		List<QName> caps = new ArrayList<QName>();
+		TServiceTemplate serviceTemplate = (TServiceTemplate) ToscaEngineServiceImpl.toscaReferenceMapper.getJAXBReference(csarId, serviceTemplateId);
+		
+		for (TEntityTemplate entity : serviceTemplate.getTopologyTemplate().getNodeTemplateOrRelationshipTemplate()) {
+			if (entity instanceof TNodeTemplate && entity.getId().equals(nodeTemplateId)) {
+				for (TCapability cap : ((TNodeTemplate) entity).getCapabilities().getCapability()) {
+					caps.add(new QName(serviceTemplate.getTargetNamespace(), cap.getId()));
+				}
+			}
+		}
+		
+		return caps;
+	}
+	
+	@Override
+	public List<QName> getNodeTemplateRequirements(CSARID csarId, QName serviceTemplateId, String nodeTemplateId) {
+		List<QName> reqs = new ArrayList<QName>();
+		TServiceTemplate serviceTemplate = (TServiceTemplate) ToscaEngineServiceImpl.toscaReferenceMapper.getJAXBReference(csarId, serviceTemplateId);
+		
+		for (TEntityTemplate entity : serviceTemplate.getTopologyTemplate().getNodeTemplateOrRelationshipTemplate()) {
+			if (entity instanceof TNodeTemplate && entity.getId().equals(nodeTemplateId)) {
+				for (TRequirement req : ((TNodeTemplate) entity).getRequirements().getRequirement()) {
+					reqs.add(new QName(serviceTemplate.getTargetNamespace(), req.getId()));
+				}
+			}
+		}
+		
+		return reqs;
+	}
+	
+	@Override
+	public QName getRelationshipTemplateTarget(CSARID csarId, QName serviceTemplateId, String relationshipTemplateId) {
+		TServiceTemplate serviceTemplate = (TServiceTemplate) ToscaEngineServiceImpl.toscaReferenceMapper.getJAXBReference(csarId, serviceTemplateId);
+		
+		for (TEntityTemplate entity : serviceTemplate.getTopologyTemplate().getNodeTemplateOrRelationshipTemplate()) {
+			if (entity instanceof TRelationshipTemplate && entity.getId().equals(relationshipTemplateId)) {
+				if (((TRelationshipTemplate) entity).getTargetElement().getRef() instanceof TNodeTemplate) {
+					return new QName(serviceTemplate.getTargetNamespace(), ((TNodeTemplate) ((TRelationshipTemplate) entity).getTargetElement().getRef()).getId());
+				}
+			}
+		}
+		
+		return null;
+	}
+	
+	@Override
+	public QName getRelationshipTemplateSource(CSARID csarId, QName serviceTemplateId, String relationshipTemplateId) {
+		TServiceTemplate serviceTemplate = (TServiceTemplate) ToscaEngineServiceImpl.toscaReferenceMapper.getJAXBReference(csarId, serviceTemplateId);
+		for (TEntityTemplate entity : serviceTemplate.getTopologyTemplate().getNodeTemplateOrRelationshipTemplate()) {
+			if (entity instanceof TRelationshipTemplate && entity.getId().equals(relationshipTemplateId)) {
+				if (((TRelationshipTemplate) entity).getSourceElement().getRef() instanceof TNodeTemplate) {
+					return new QName(serviceTemplate.getTargetNamespace(), ((TNodeTemplate) ((TRelationshipTemplate) entity).getSourceElement().getRef()).getId());
+				}
+			}
+		}
+		return null;
 	}
 	
 }
