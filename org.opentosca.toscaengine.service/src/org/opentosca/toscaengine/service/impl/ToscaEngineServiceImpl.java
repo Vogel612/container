@@ -2255,8 +2255,10 @@ public class ToscaEngineServiceImpl implements IToscaEngineService {
 		
 		for (TEntityTemplate entity : serviceTemplate.getTopologyTemplate().getNodeTemplateOrRelationshipTemplate()) {
 			if (entity instanceof TNodeTemplate && entity.getId().equals(nodeTemplateId)) {
-				for (TCapability cap : ((TNodeTemplate) entity).getCapabilities().getCapability()) {
-					caps.add(new QName(serviceTemplate.getTargetNamespace(), cap.getId()));
+				if (((TNodeTemplate) entity).getCapabilities() != null) {
+					for (TCapability cap : ((TNodeTemplate) entity).getCapabilities().getCapability()) {
+						caps.add(new QName(serviceTemplate.getTargetNamespace(), cap.getId()));
+					}
 				}
 			}
 		}
@@ -2271,8 +2273,10 @@ public class ToscaEngineServiceImpl implements IToscaEngineService {
 		
 		for (TEntityTemplate entity : serviceTemplate.getTopologyTemplate().getNodeTemplateOrRelationshipTemplate()) {
 			if (entity instanceof TNodeTemplate && entity.getId().equals(nodeTemplateId)) {
-				for (TRequirement req : ((TNodeTemplate) entity).getRequirements().getRequirement()) {
-					reqs.add(new QName(serviceTemplate.getTargetNamespace(), req.getId()));
+				if (((TNodeTemplate) entity).getRequirements() != null) {
+					for (TRequirement req : ((TNodeTemplate) entity).getRequirements().getRequirement()) {
+						reqs.add(new QName(serviceTemplate.getTargetNamespace(), req.getId()));
+					}
 				}
 			}
 		}
