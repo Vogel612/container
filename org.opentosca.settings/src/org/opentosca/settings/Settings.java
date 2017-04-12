@@ -5,6 +5,8 @@ import java.util.Properties;
 
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Global OpenTOSCA Settings.
@@ -12,9 +14,14 @@ import org.osgi.framework.BundleContext;
  */
 public class Settings implements BundleActivator {
 
-	public final static String CONTAINER_API = "http://localhost:1337/containerapi";
-	public final static String CONTAINER_INSTANCEDATA_API = "http://localhost:1337/containerapi/CSARs/{csarid}/ServiceTemplates/{servicetemplateid}/Instances/";
+	public final static String OPENTOSCA_CONTAINER_HOSTNAME = System.getProperty("org.opentosca.container.hostname", "localhost");
+	public final static String OPENTOSCA_CONTAINER_PORT = System.getProperty("org.opentosca.container.port", "1337");
 
+	public final static String CONTAINER_API = "http://" + Settings.OPENTOSCA_CONTAINER_HOSTNAME + ":" + Settings.OPENTOSCA_CONTAINER_PORT + "/containerapi";
+	public final static String CONTAINER_INSTANCEDATA_API = "http://" + Settings.OPENTOSCA_CONTAINER_HOSTNAME + ":" + Settings.OPENTOSCA_CONTAINER_PORT + "/containerapi/CSARs/{csarid}/ServiceTemplates/{servicetemplateid}/Instances/";
+
+	private static Logger logger = LoggerFactory.getLogger(Settings.class);
+	
 	// TODO: Use public static final variables instead, as in
 	// StaticTOSCANamespaces. The problems with the current approach is: (i)
 	// Full-text search to find usage instead of Java Reference Search. (ii) It
@@ -43,6 +50,9 @@ public class Settings implements BundleActivator {
 	public void start(BundleContext bundleContext) throws Exception {
 		Settings.context = bundleContext;
 
+		Settings.logger.info("org.opentosca.container.hostname={}", Settings.OPENTOSCA_CONTAINER_HOSTNAME);
+		Settings.logger.info("org.opentosca.container.port={}", Settings.OPENTOSCA_CONTAINER_PORT);
+		
 		// /////////////////// PATHS ///////////////////
 
 		// contains data of OpenTOSCA that should be stored permanently
@@ -66,6 +76,7 @@ public class Settings implements BundleActivator {
 		// /////////////////// URLS ///////////////////
 
 		if (System.getProperty("openTOSCAWineryPath") == null) {
+			Settings.setSetting("openTOSCAWineryPath", "http://" + Settings.OPENTOSCA_CONTAINER_HOSTNAME + ":8080/winery");
 			Settings.setSetting("openTOSCAWineryPath", "http://localhost:8880/winery");
 		} else {
 			Settings.setSetting("openTOSCAWineryPath", System.getProperty("openTOSCAWineryPath"));
@@ -75,7 +86,7 @@ public class Settings implements BundleActivator {
 		Settings.setSetting("containerUri", Settings.CONTAINER_API);
 
 		// URI of the DataInstanceAPI
-		Settings.setSetting("datainstanceUri", "http://localhost:1337/datainstance");
+		Settings.setSetting("datainstanceUri", "http://" + Settings.OPENTOSCA_CONTAINER_HOSTNAME + ":" + Settings.OPENTOSCA_CONTAINER_PORT + "/datainstance");
 
 		// /////////////////// CSAR ///////////////////
 
@@ -128,5 +139,4 @@ public class Settings implements BundleActivator {
 	public static void setSetting(String setting, String value) {
 		Settings.settings.setProperty(setting, value);
 	}
-
 }
