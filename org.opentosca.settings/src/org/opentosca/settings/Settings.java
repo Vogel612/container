@@ -21,7 +21,7 @@ public class Settings implements BundleActivator {
 	public final static String CONTAINER_INSTANCEDATA_API = "http://" + Settings.OPENTOSCA_CONTAINER_HOSTNAME + ":" + Settings.OPENTOSCA_CONTAINER_PORT + "/containerapi/CSARs/{csarid}/ServiceTemplates/{servicetemplateid}/Instances/";
 
 	private static Logger logger = LoggerFactory.getLogger(Settings.class);
-	
+
 	// TODO: Use public static final variables instead, as in
 	// StaticTOSCANamespaces. The problems with the current approach is: (i)
 	// Full-text search to find usage instead of Java Reference Search. (ii) It
@@ -52,7 +52,7 @@ public class Settings implements BundleActivator {
 
 		Settings.logger.info("org.opentosca.container.hostname={}", Settings.OPENTOSCA_CONTAINER_HOSTNAME);
 		Settings.logger.info("org.opentosca.container.port={}", Settings.OPENTOSCA_CONTAINER_PORT);
-		
+
 		// /////////////////// PATHS ///////////////////
 
 		// contains data of OpenTOSCA that should be stored permanently
@@ -76,8 +76,8 @@ public class Settings implements BundleActivator {
 		// /////////////////// URLS ///////////////////
 
 		if (System.getProperty("openTOSCAWineryPath") == null) {
-			Settings.setSetting("openTOSCAWineryPath", "http://" + Settings.OPENTOSCA_CONTAINER_HOSTNAME + ":8080/winery");
-			Settings.setSetting("openTOSCAWineryPath", "http://localhost:8880/winery");
+			//Settings.setSetting("openTOSCAWineryPath", "http://" + Settings.OPENTOSCA_CONTAINER_HOSTNAME + ":8080/winery");
+			Settings.setSetting("openTOSCAWineryPath", "http://192.168.99.100:8080/winery");
 		} else {
 			Settings.setSetting("openTOSCAWineryPath", System.getProperty("openTOSCAWineryPath"));
 		}
