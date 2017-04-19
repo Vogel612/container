@@ -77,7 +77,7 @@ public class Settings implements BundleActivator {
 
 		if (System.getProperty("openTOSCAWineryPath") == null) {
 			//Settings.setSetting("openTOSCAWineryPath", "http://" + Settings.OPENTOSCA_CONTAINER_HOSTNAME + ":8080/winery");
-			Settings.setSetting("openTOSCAWineryPath", "http://192.168.99.100:8080/winery");
+			Settings.setSetting("openTOSCAWineryPath", "http://localhost:8080/winery");
 		} else {
 			Settings.setSetting("openTOSCAWineryPath", System.getProperty("openTOSCAWineryPath"));
 		}
